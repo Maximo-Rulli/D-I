@@ -1,0 +1,15 @@
+{
+	"builds":[
+		{
+			"src":"C:/Users/Usuario/Desktop/Dev/DyI/main.py",
+			"use":"@vercel/python"
+		}
+	],
+	"routes":[
+		{
+			"src":"/(.*)",
+			"dest":"C:/Users/Usuario/Desktop/Dev/DyI/main.py"
+		}
+
+	]
+}
