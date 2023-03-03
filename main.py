@@ -1,12 +1,12 @@
-from flask import Flask
+from flask import Flask, request, jsonify
 import sympy as sym
 
 app = Flask(__name__)
 
 x, y, z = sym.symbols('x y z')
 
-des = 'd'
-func = 'cos(x**2)'
+des = 'i'
+func = 'sin(2*x)'
 var = x
 
 def differ(f):
@@ -20,8 +20,21 @@ def inte(f):
     return str(inte)
 
 @app.route('/')
+def initialize():
+    return "Flask inicializado!"
+
+@app.route('/send', methods=['GET', 'POST'])
 def calculate():
+    try:
+        data = request.get_json()
+        # process the received data
+        result = {'result': 'success'}
+        return f"{jsonify(result)}, la data pasada es {data}"
+    except:
+        return "Ningun parametro pasado"
+    """
     if des=='d':
         return differ(func)
     else:
         return inte(func)
+    """
