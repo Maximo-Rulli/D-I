@@ -10,13 +10,11 @@ func = 'sin(2*x)'
 var = x
 
 def differ(f):
-    f = sym.simplify(f)
-    differ = sym.diff(f, var)
+    differ = sym.diff(sym.simplify(f), var)
     return str(differ)
 
 def inte(f):
-    f = sym.simplify(f)
-    inte = sym.integrate(f, var)
+    inte = sym.integrate(sym.simplify(f), var)
     return str(inte)
 
 @app.route('/')
@@ -28,8 +26,12 @@ def calculate():
     try:
         data = request.get_json()
         # process the received data
-        result = {'result': 'success'}
-        return f"{jsonify(result)}, la data pasada es {data}"
+        if data['des']=='d':
+            return f"Función derivada resultante: {differ(data['func'])}"
+        elif data['des']=='i':
+            return f"Función integrada resultante: {inte(data['func'])}"
+        
+        #return f"{jsonify(result)}, la data pasada es {data}"
     except:
         return "Ningun parametro pasado"
     """
