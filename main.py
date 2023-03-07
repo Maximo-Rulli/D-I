@@ -17,6 +17,16 @@ def inte(f):
     inte = sym.integrate(sym.simplify(f), var)
     return str(inte)
 
+
+class ploter():
+    def __init__(self, x_scale:float, y_scale:float, x_pos:float) -> None:
+        self.x_scale = x_scale
+        self.y_scale = y_scale
+        self.x_pos = x_pos
+
+    def plot(self):
+        pass
+
 @app.route('/')
 def initialize():
     return "Flask inicializado!"
@@ -31,12 +41,6 @@ def calculate():
         elif data['des']=='i':
             return f"Función integrada resultante: {inte(data['func'])}"
         
-        #return f"{jsonify(result)}, la data pasada es {data}"
     except:
-        return "Ningun parametro pasado"
-    """
-    if des=='d':
-        return differ(func)
-    else:
-        return inte(func)
-    """
+        return "Los parametros fueron mal ingresados"
+   
