@@ -19,13 +19,20 @@ def inte(f):
 
 
 class ploter():
-    def __init__(self, x_scale:float, y_scale:float, x_pos:float) -> None:
+    def __init__(self, x_scale:float, y_scale:float, x_pos:float) :
         self.x_scale = x_scale
         self.y_scale = y_scale
         self.x_pos = x_pos
+        self.points = []
 
-    def plot(self):
-        pass
+    def plot(self, func:str) -> None:
+        func = sym.sympify(func)
+        for i in range(100):
+            self.points.append(func.evalf(subs={x: i}))
+
+Plot = ploter(1, 1, 1)
+Plot.plot(func)
+print(Plot.points)
 
 @app.route('/')
 def initialize():
@@ -36,10 +43,11 @@ def calculate():
     try:
         data = request.get_json()
         # process the received data
+        print(type(data['func']))
         if data['des']=='d':
-            return f"Función derivada resultante: {differ(data['func'])}"
+            return f"Función derivada resultante: {differ(data['func'])}"  
         elif data['des']=='i':
-            return f"Función integrada resultante: {inte(data['func'])}"
+            return f"Función integrada resultante: {type(inte(data['func']))}"
         
     except:
         return "Los parametros fueron mal ingresados"
