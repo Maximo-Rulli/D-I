@@ -1,20 +1,23 @@
 from flask import Flask, request, jsonify
 import sympy as sym
+import matplotlib.pyplot as plt
+import numpy as np
 
 app = Flask(__name__)
 
 
-#Defino my SCALING_FACTOR que en sí es el factor por el cual se va 
+#Defino my X_FACTOR que en sí es el factor por el cual se va 
 #a escalar el valor pasado por el potenciometro
 
-SCALING_FACTOR = 3.017
+X_FACTOR = 2.187
+Y_FACTOR = 2.187
 NUM_POINTS = 250
 BASE_POINT = 5
 
 x = sym.symbols('x')
 
 des = 'i'
-func = 'sin(x)'
+func = 'x**2'
 var = x
 
 def differ(f):
@@ -28,34 +31,51 @@ def inte(f):
 
 class ploter():
     def __init__(self, x_scale:float, y_scale:float, x_pos:float) :
+        #Parametros: 
+        # x_scale: valor pasado por potenciometro de escala en x 
+        # y_scale: valor pasado por potenciometro de escala en y 
+        # x_pos: valor pasado por potenciometro de donde empieza mi punto 0,0
         self.x_scale = x_scale
         self.y_scale = y_scale
         self.x_pos = x_pos
-        self.points = []
+        self.points = np.zeros((2, NUM_POINTS*2), dtype=float)
 
     def plot(self, func:str) -> None:
+        #Convierto de string a sympy
         func = sym.sympify(func)
-        scale_fac = SCALING_FACTOR**self.x_scale
+        #Obtengo el xscale_fac que es en sí mi factor de escala 
+        # una vez que le pase por el potenciometro mi valor de volts, por ello se eleva
+        xscale_fac = X_FACTOR**self.x_scale
+        yscale_fac = Y_FACTOR**self.y_scale
         x_initial = self.x_pos
         #Primero defino todos los puntos negativos
         for i in range(NUM_POINTS):
             scale = BASE_POINT/NUM_POINTS
-            scale *= scale_fac
-            punto = -scale*i+x_initial
-            self.points.append(func.evalf(subs={x: punto}))
+            scale *= xscale_fac
+            punto = -scale*i+x_initial*scale
+            try:
+                self.points[1, i] = func.evalf(subs={x: punto})/yscale_fac
+            except TypeError:
+                self.points[1, i] = np.nan
+            self.points[0, i] = punto
         
         #Una vez definidos los puntos negativos defino los positivos
         for i in range(NUM_POINTS-1):
             scale = BASE_POINT/NUM_POINTS
-            scale *= scale_fac
-            punto = scale*(i+1)+x_initial
-            self.points.append(func.evalf(subs={x: punto}))
+            scale *= xscale_fac
+            punto = scale*(i+1)+x_initial*scale
+            try:
+                self.points[1, i+249] = func.evalf(subs={x: punto})/yscale_fac
+            except TypeError:
+                self.points[1, i+249] = np.nan
+            self.points[0, i+249] = punto
 
 
-Plot = ploter(0, 1, 0)
+Plot = ploter(5, 5, 0)
 Plot.plot(func)
-print(Plot.points[1])
-print(Plot.points[250])
+fig, ax = plt.subplots()
+ax.plot(Plot.points[0], Plot.points[1])
+plt.show()
 @app.route('/')
 def initialize():
     return "Flask inicializado!"
@@ -73,4 +93,3 @@ def calculate():
         
     except:
         return "Los parametros fueron mal ingresados"
-   
