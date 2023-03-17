@@ -10,7 +10,7 @@ app = Flask(__name__)
 #a escalar el valor pasado por el potenciometro
 
 X_FACTOR = 2.187
-Y_FACTOR = 2.187
+Y_FACTOR = 10
 NUM_POINTS = 250
 BASE_POINT_X = 5
 BASE_POINT_Y = 10
@@ -18,7 +18,7 @@ BASE_POINT_Y = 10
 x = sym.symbols('x')
 
 des = 'i'
-func = 'x**2'
+func = 'x**x'
 var = x
 
 def differ(f):
@@ -49,11 +49,11 @@ class ploter():
         xscale_fac = X_FACTOR**self.x_scale
         yscale_fac = Y_FACTOR**self.y_scale
         x_initial = self.x_pos
+        scale_x = BASE_POINT_X/NUM_POINTS
+        scale_x *= xscale_fac
         #Primero defino todos los puntos negativos
         for i in range(NUM_POINTS):
-            scale = BASE_POINT/NUM_POINTS
-            scale *= xscale_fac
-            punto = -scale*i+x_initial*scale
+            punto = -scale_x*i+x_initial*scale_x
             try:
                 self.points[1, i] = func.evalf(subs={x: punto})/yscale_fac
             except TypeError:
@@ -62,9 +62,7 @@ class ploter():
         
         #Una vez definidos los puntos negativos defino los positivos
         for i in range(NUM_POINTS-1):
-            scale = BASE_POINT/NUM_POINTS
-            scale *= xscale_fac
-            punto = scale*(i+1)+x_initial*scale
+            punto = scale_x*(i+1)+x_initial*scale_x
             try:
                 self.points[1, i+249] = func.evalf(subs={x: punto})/yscale_fac
             except TypeError:
