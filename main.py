@@ -12,7 +12,8 @@ app = Flask(__name__)
 X_FACTOR = 2.187
 Y_FACTOR = 2.187
 NUM_POINTS = 250
-BASE_POINT = 5
+BASE_POINT_X = 5
+BASE_POINT_Y = 10
 
 x = sym.symbols('x')
 
