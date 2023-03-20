@@ -5,6 +5,6 @@ $headers = @{
      des = "i"
      func = "sin(2*x)"
  } | ConvertTo-Json
-Invoke-WebRequest -Method POST -Uri "http://127.0.0.1:5000/send" -Headers $headers -Body $body 
+Invoke-WebRequest -Method POST -Uri "http://MaximoRulli.pythonanywhere.com/send" -Headers $headers -Body $body 
 
 flask --app main run

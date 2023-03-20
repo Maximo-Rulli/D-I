@@ -39,6 +39,8 @@ class Ploter():
         self.points = np.zeros((2, NUM_POINTS*2), dtype=float)
 
     def plot(self, func:str) -> None:
+        #Vacio mi array por las dudas
+        self.points = np.zeros((2, NUM_POINTS*2), dtype=float)
         #Convierto de string a sympy
         func = sym.sympify(func)
         #Obtengo el xscale_fac que es en sí mi factor de escala 
@@ -77,12 +79,21 @@ def initialize():
 def calculate():
     try:
         data = request.get_json()
-        # process the received data
-        print(type(data['func']))
         if data['des']=='d':
-            return jsonify(dif_points=differ(data['func']), og_points=data['func']) 
+            return jsonify(calc_func=differ(data['func']), og_func=data['func']) 
         elif data['des']=='i':
-            return jsonify(dif_points=inte(data['func']), og_points=data['func'])
+            return jsonify(calc_func=inte(data['func']), og_func=data['func'])
         
     except:
         return "Los parametros fueron mal ingresados"
+    
+@app.route('/plot', methods=['GET', 'POST'])
+def ploter():
+    try:
+        data = request.get_json()
+        my_plot = Ploter(data['x_scale'], data['y_scale'], data['x_pos'])
+        og_points = my_plot.plot(data['og_func'])
+        calc_points = my_plot.plot(data['calc_func'])
+        return jsonify(og_points = og_points, calc_points = calc_points)
+    except:
+        return 'Ocurrió un error al procesar los datos'
