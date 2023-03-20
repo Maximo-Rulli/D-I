@@ -1,6 +1,5 @@
 from flask import Flask, request, jsonify
 import sympy as sym
-import matplotlib.pyplot as plt
 import numpy as np
 
 app = Flask(__name__)
@@ -10,15 +9,13 @@ app = Flask(__name__)
 #a escalar el valor pasado por el potenciometro
 
 X_FACTOR = 2.187
-Y_FACTOR = 10
+Y_FACTOR = 100
 NUM_POINTS = 250
 BASE_POINT_X = 5
 BASE_POINT_Y = 10
 
 x = sym.symbols('x')
 
-des = 'i'
-func = 'x**x'
 var = x
 
 def differ(f):
@@ -30,8 +27,8 @@ def inte(f):
     return str(inte)
 
 
-class ploter():
-    def __init__(self, x_scale:float, y_scale:float, x_pos:float) :
+class Ploter():
+    def __init__(self, x_scale:float, y_scale:float, x_pos:float) -> None:
         #Parametros: 
         # x_scale: valor pasado por potenciometro de escala en x 
         # y_scale: valor pasado por potenciometro de escala en y 
@@ -68,13 +65,10 @@ class ploter():
             except TypeError:
                 self.points[1, i+249] = np.nan
             self.points[0, i+249] = punto
+        
+        return np.asarray(self.points)
 
 
-Plot = ploter(5, 5, 0)
-Plot.plot(func)
-fig, ax = plt.subplots()
-ax.plot(Plot.points[0], Plot.points[1])
-plt.show()
 @app.route('/')
 def initialize():
     return "Flask inicializado!"
@@ -86,9 +80,9 @@ def calculate():
         # process the received data
         print(type(data['func']))
         if data['des']=='d':
-            return f"Función derivada resultante: {differ(data['func'])}"  
+            return jsonify(dif_points=differ(data['func']), og_points=data['func']) 
         elif data['des']=='i':
-            return f"Función integrada resultante: {type(inte(data['func']))}"
+            return jsonify(dif_points=inte(data['func']), og_points=data['func'])
         
     except:
         return "Los parametros fueron mal ingresados"
